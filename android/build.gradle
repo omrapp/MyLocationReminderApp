@@ -16,6 +16,16 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
+
+    allprojects {
+        repositories {
+            // ... other repositories like google(), mavenCentral(), etc.
+            maven { url "${project(':react-native-background-geolocation').projectDir}/libs" }
+            maven { url 'https://developer.huawei.com/repo/' } // If you are using Huawei devices
+            // If you are also using react-native-background-fetch
+            maven { url "${project(':react-native-background-fetch').projectDir}/libs" }
+        }
+    }
 }
 
 apply plugin: "com.facebook.react.rootproject"
