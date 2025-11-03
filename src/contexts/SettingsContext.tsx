@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { defaultSettingData, SettingData } from '../data/SettingData';
 import { getDataFromLocalStorage, saveDataToLocalStorage } from '../utils/Utils';
+import { APP_CONSTANTS } from '../config/constants';
 
-const STORAGE_KEY = '@settings_v4';
 
 interface ISettingsContext {
     settingsData: SettingData;
@@ -25,7 +25,7 @@ export const SettingsProvider = ({ children }) => {
     useLayoutEffect(() => {
 
         const loadSettings = async () => {
-            const data = await getDataFromLocalStorage(STORAGE_KEY) ?? defaultSettingData;
+            const data = await getDataFromLocalStorage(APP_CONSTANTS.STORAGE_KEYS.SETTINGS) ?? defaultSettingData;
             console.log("Get Setting Data:" + JSON.stringify(data))
             setSettingsData(data);
 
@@ -39,7 +39,7 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
 
         console.log("Settings Data Changed:" + JSON.stringify(settingsData))
-        saveDataToLocalStorage(STORAGE_KEY, settingsData)
+        saveDataToLocalStorage(APP_CONSTANTS.STORAGE_KEYS.SETTINGS, settingsData)
 
     }, [settingsData]);
 

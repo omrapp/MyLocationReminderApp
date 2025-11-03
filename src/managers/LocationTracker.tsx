@@ -6,8 +6,8 @@ import { addLocation } from '../slices/locationSlice';
 import { useSettings } from '../contexts/SettingsContext';
 
 //location srevice imports
-import { requestLocationPermission } from '../services/foreground-location-service';
-import { startBackgroundLocationService, stopBackgroundLocationService } from '../services/background-location-service';
+import { requestLocationPermission } from '../services/location/foreground-location-service';
+import { startBackgroundLocationService, stopBackgroundLocationService } from '../services/location/background-location-service';
 
 const LocationTracker = () => {
 

@@ -17,6 +17,14 @@ Security & privacy:
 - Location data stays on the device. If you plan to sync or upload locations, make sure you inform users and secure the transport and storage appropriately.
 
 
+### Screenshots
+
+![Alt text](/screenshot/1.jpeg?raw=true "Home")
+![Alt text](/screenshot/2.jpeg?raw=true "Settings")
+![Alt text](/screenshot/3.jpeg?raw=true "Notification")
+
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started

@@ -1,7 +1,6 @@
 import notifee, { AndroidImportance, TriggerType, RepeatFrequency, AuthorizationStatus } from '@notifee/react-native';
 import { PermissionsAndroid, Platform } from 'react-native';
-
-const CHANNEL_ID = 'tracker-channel';
+import { APP_CONSTANTS } from '../../config/constants';
 
 // Request permissions (required for iOS)
 export const requestNotificationPermission = async () => {
@@ -21,8 +20,8 @@ export const requestNotificationPermission = async () => {
 
 const createNotificationChannel = async (): Promise<string> => {
     const channelId = await notifee.createChannel({
-        id: CHANNEL_ID,
-        name: CHANNEL_ID + 'Channel',
+        id: APP_CONSTANTS.NOTIFICATION.CHANNEL_ID,
+        name: APP_CONSTANTS.NOTIFICATION.CHANNEL_NAME,
         importance: AndroidImportance.HIGH,
     });
     return channelId;
@@ -93,5 +92,5 @@ export const cancelNotification = (notificationId: string) => {
 export const cancelAllNotifications = async () => {
     console.log('Cancelling all notifications...');
     await notifee.cancelAllNotifications();
-    notifee.deleteChannel(CHANNEL_ID);
+    notifee.deleteChannel(APP_CONSTANTS.NOTIFICATION.CHANNEL_ID);
 }

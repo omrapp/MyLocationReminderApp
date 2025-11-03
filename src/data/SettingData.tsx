@@ -1,3 +1,4 @@
+import { APP_CONSTANTS } from "../config/constants";
 
 export interface SettingData {
     intervalInSeconds: number;
@@ -9,10 +10,10 @@ export interface SettingData {
 }
 
 export const defaultSettingData: SettingData = {
-    intervalInSeconds: 8, // Default interval in seconds
+    intervalInSeconds: APP_CONSTANTS.LOCATION.DEFAULT_INTERVAL, // Default interval in seconds
     isNotificationEnabled: true,
     isTrackerEnabled: true,
     continueOnTerminateEnabled: false,
-    notificationRepeatIntervalInMinutes: 10, // Default notification repeat inteval in minutes
+    notificationRepeatIntervalInMinutes: APP_CONSTANTS.LOCATION.DEFAULT_NOTIFICATION_INTERVAL, // Default notification repeat inteval in minutes
 };
 

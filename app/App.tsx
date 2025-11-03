@@ -16,6 +16,7 @@ import SettingScreen from '../src/screens/SettingsScreen';
 import UserLocationListScreen from '../src/screens/UserLocationListScreen';
 import { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { APP_CONSTANTS } from '../src/config/constants';
 
 // Create a Drawer Navigator
 const Drawer = createDrawerNavigator();
@@ -37,9 +38,9 @@ function App() {
         <SafeAreaView style={styles.container}>
           <NavigationContainer>
             <StatusBar barStyle={isDarkMode ? "dark-content" : "light-content"} />
-            <Drawer.Navigator initialRouteName="Home">
-              <Drawer.Screen name="Home" component={UserLocationListScreen} />
-              <Drawer.Screen name="Settings" component={SettingScreen} />
+            <Drawer.Navigator initialRouteName={APP_CONSTANTS.SCREENS.HOME}>
+              <Drawer.Screen name={APP_CONSTANTS.SCREENS.HOME} component={UserLocationListScreen} />
+              <Drawer.Screen name={APP_CONSTANTS.SCREENS.SETTINGS} component={SettingScreen} />
             </Drawer.Navigator>
           </NavigationContainer>
         </SafeAreaView>

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import BackgroundTimer from 'react-native-background-timer';
 
 //redux import
@@ -7,8 +7,8 @@ import { useSelector } from "react-redux";
 
 //notification service imports
 import notifee, { EventType } from '@notifee/react-native';
-import { cancelAllNotifications, requestNotificationPermission, sendLocalNotification } from "../services/push-notification-service";
-import { stopBackgroundLocationService } from "../services/background-location-service";
+import { cancelAllNotifications, requestNotificationPermission, sendLocalNotification } from "../services/notification/push-notification-service";
+import { stopBackgroundLocationService } from "../services/location/background-location-service";
 import { areLatestRangeIndicesEqual } from "../utils/Utils";
 
 const MIN = 60
@@ -17,8 +17,9 @@ export const NotificationHandler = () => {
 
     const { settingsData } = useSettings();
     const locations = useSelector((state) => state.locations.list);
-
     const [latestIntervalId, setLatestIntervalId] = useState<number | null>(null)
+
+    const locationsRef = useRef(locations);
 
     useLayoutEffect(() => {
 
@@ -54,7 +55,10 @@ export const NotificationHandler = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [settingsData.isNotificationEnabled, settingsData.isTrackerEnabled, settingsData.notificationRepeatIntervalInMinutes]);
 
-
+    useEffect(() => {
+        console.log("A new location added " + locations.length);
+        locationsRef.current = locations;
+    }, [locations]);
 
     useEffect(() => {
         const unsubscribeOnForegroundEvent = notifee.onForegroundEvent(({ type, detail }) => {
@@ -92,8 +96,21 @@ export const NotificationHandler = () => {
     }
 
     const isUserStationary = () => {
+
         const range = Math.floor((settingsData.notificationRepeatIntervalInMinutes * MIN) / settingsData.intervalInSeconds);
-        return areLatestRangeIndicesEqual(locations, range)
+        const currentLocationsData = locationsRef.current;
+        const startIndex = currentLocationsData.length - range
+        const endIndex = currentLocationsData.length - 1
+
+        console.log("Locations list length: " + currentLocationsData.length + ", startIndex: " + startIndex + ", endIndex: " + endIndex)
+
+        if (!currentLocationsData || currentLocationsData.length === 0 || startIndex < 0 || endIndex > currentLocationsData.length || startIndex >= endIndex) {
+            return false;
+        }
+
+        const subArray = currentLocationsData.slice(startIndex, endIndex);
+
+        return areLatestRangeIndicesEqual(subArray)
     }
 
     function removeBackgroundTimer() {

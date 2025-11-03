@@ -1,5 +1,5 @@
 import BackgroundGeolocation from 'react-native-background-geolocation';
-import { LocationItem } from '../data/LocationItem';
+import { LocationItem } from '../../data/LocationItem';
 
 export const startBackgroundLocationService = (intervalInSeconds: number, continueOnTerminate: boolean, callback: (location: LocationItem) => void) => {
 

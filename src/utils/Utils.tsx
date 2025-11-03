@@ -66,20 +66,10 @@ export const openMapWithCoordinates = async (latitude: number, longitude: number
 };
 
 
-export const areLatestRangeIndicesEqual = (list: LocationItem[], range: number) => {
-    const startIndex = list.length - range
-    const endIndex = list.length - 1
+export const areLatestRangeIndicesEqual = (list: LocationItem[]) => {
 
-    console.log("Locations list length: " + list.length + ", startIndex: " + startIndex + ", endIndex: " + endIndex)
-
-    if (!list || list.length === 0 || startIndex < 0 || endIndex > list.length || startIndex >= endIndex) {
-        return false;
-    }
-
-    const subArray = list.slice(startIndex, endIndex);
-
-    const latitudes = subArray.map((item: LocationItem) => parseFloat(item.latitude.toFixed(4)));
-    const longitudes = subArray.map((item: LocationItem) => parseFloat(item.longitude.toFixed(4)));
+    const latitudes = list.map((item: LocationItem) => parseFloat(item.latitude.toFixed(4)));
+    const longitudes = list.map((item: LocationItem) => parseFloat(item.longitude.toFixed(4)));
 
     const lastLatitude = latitudes[latitudes.length - 1];
     const lastLongitude = longitudes[longitudes.length - 1];
