@@ -1,3 +1,22 @@
+# Location Reminder
+
+## About Location Reminder App
+
+Location Reminder App collects the user's location at a configurable interval and notifies the user if they haven't moved for a specified period. The app runs location tracking both in the foreground and background.
+
+Key behaviors:
+- Periodic location sampling (interval is configurable in the app settings).
+- If the user remains within a small distance threshold (i.e., hasn't moved) after the configured interval, the app sends a local notification to remind the user.
+- Background and Foreground tracking uses a background geolocation service for reliable updates once the app is on background and foreground.
+
+Permissions and platform notes:
+- Android: ACCESS_FINE_LOCATION and ACCESS_BACKGROUND_LOCATION are required for background tracking. You must also request runtime permissions.
+- iOS: NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription keys are required in Info.plist. For background updates, request the appropriate authorization and configure background modes.
+
+Security & privacy:
+- Location data stays on the device. If you plan to sync or upload locations, make sure you inform users and secure the transport and storage appropriately.
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
