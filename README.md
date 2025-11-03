@@ -19,11 +19,13 @@ Security & privacy:
 
 ### Screenshots
 
-![Alt text](/screenshot/1.jpeg?raw=true "Home")
-![Alt text](/screenshot/2.jpeg?raw=true "Settings")
-![Alt text](/screenshot/3.jpeg?raw=true "Notification")
+<p align="center">
+  <img src="screenshot/1.jpeg" alt="Home" width="200" hspace=30/>
+  <img src="screenshot/2.jpeg" alt="Settings" width="200" hspace=30/>
+  <img src="screenshot/3.jpeg" alt="Notification" width="200" hspace=30/>
+</p>
 
-
+---
 
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
