@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
-import { defaultSettingData, SettingData } from '../data/SettingData';
 import { getDataFromLocalStorage, saveDataToLocalStorage } from '../utils/Utils';
 import { APP_CONSTANTS } from '../config/constants';
+import { defaultSettingData, SettingData } from '../types/SettingData';
 
 
 interface ISettingsContext {

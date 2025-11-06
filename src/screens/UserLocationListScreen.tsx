@@ -1,16 +1,16 @@
 //react imports
-import React, { useLayoutEffect } from 'react';
-import { FlatList, View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useLayoutEffect } from 'react';
+import { FlatList, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
 //redux imports
-import { clearLocations } from '../slices/locationSlice';
+import { clearLocations, fetchPaginatedData, setCurrentPage } from '../slices/locationSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 //component imports
 import LocationTracker from '../managers/LocationTracker';
-import { LocationItem } from '../data/LocationItem';
+import { LocationItem } from '../types/LocationItem';
 
 //utils imports
 import LocationItemView from '../components/LocationItemView';
@@ -19,11 +19,13 @@ import { NotificationHandler } from '../managers/NotificationHandler';
 
 
 const UserLocationListScreen = () => {
-    const navigation = useNavigation();
-    const locations = useSelector((state) => state.locations.list);
-    const dispatch = useDispatch();
 
-    const handleClearAll = () => {
+    const navigation = useNavigation();
+
+    const dispatch = useDispatch();
+    const { items, currentPage, totalPages, loading, error, pageSize } = useSelector((state) => state.locations);
+
+    const handleClearAll = React.useCallback(() => {
         Alert.alert(
             "Clear All Locations",
             "Are you sure you want to clear all locations? This action cannot be undone.",
@@ -41,22 +43,57 @@ const UserLocationListScreen = () => {
                 }
             ]
         );
-    };
+    }, [dispatch]);
+
+    // Move header button component outside render
+    const HeaderRightButton = React.useCallback(() => (
+        <TouchableOpacity
+            onPress={handleClearAll}
+            style={styles.headerButton}>
+            <Icon name="clear-all" size={24} color="#017cffff" />
+        </TouchableOpacity>
+    ), [handleClearAll]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            // eslint-disable-next-line react/no-unstable-nested-components
-            headerRight: () => (
-                <TouchableOpacity
-                    onPress={handleClearAll}
-                    style={styles.headerButton}>
-                    <Icon name="clear-all" size={24} color="#017cffff" />
-                </TouchableOpacity>
-            ),
+            headerRight: HeaderRightButton,
         });
+    }, [navigation, HeaderRightButton]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation]);
+
+    useEffect(() => {
+        dispatch(fetchPaginatedData({ currentPage, pageSize }));
+    }, [dispatch, currentPage, pageSize]);
+
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            dispatch(setCurrentPage(currentPage + 1));
+        }
+    };
+
+    // const handlePrevPage = () => {
+    //     if (currentPage > 1) {
+    //         dispatch(setCurrentPage(currentPage - 1));
+    //     }
+    // };
+
+    if (loading) {
+        return <ActivityIndicator size="large" style={styles.loader} />;
+    }
+
+    if (error) {
+        return <Text style={styles.errorText}>Error: {error}</Text>;
+    }
+
+
+    const listFooterComponent = () => (
+        <View style={{ paddingVertical: 20 }}>
+            <ActivityIndicator size="large" color="#0875f2ff" />
+        </View>
+    );
+
+
 
     const renderItem = ({ item }: { item: LocationItem }) => (
         <LocationItemView item={item} />
@@ -67,10 +104,13 @@ const UserLocationListScreen = () => {
             <NotificationHandler />
             <LocationTracker />
             <FlatList
-                data={locations}
+                data={items}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 contentContainerStyle={styles.listContainer}
+                onEndReached={handleNextPage}
+                onEndReachedThreshold={0.1} // Trigger when 10% from the end
+                ListFooterComponent={loading ? listFooterComponent : null}
             />
         </View>
     );
@@ -86,7 +126,17 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1
-    }
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 20,
+    },
 });
 
 export default UserLocationListScreen;

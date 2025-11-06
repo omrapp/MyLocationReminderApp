@@ -1,6 +1,8 @@
 import notifee, { AndroidImportance, TriggerType, RepeatFrequency, AuthorizationStatus } from '@notifee/react-native';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { APP_CONSTANTS } from '../../config/constants';
+import { LocationItem } from '../../types/LocationItem';
+import { isUserStationary } from '../../utils/Utils';
 
 // Request permissions (required for iOS)
 export const requestNotificationPermission = async () => {
@@ -64,23 +66,26 @@ export const scheduleLocalNotification = async (repeatIntervalInMins: number) =>
 }
 
 
-export const sendLocalNotification = async () => {
+export const sendLocalNotification = async (list: LocationItem[], mins: number, seconds: number) => {
 
-    const channelId = await createNotificationChannel();
+    if (isUserStationary(list, mins, seconds)) {
+        console.log("Calling sendLocalNotification from NotificationHandler.tsx");
 
-    // Display a notification
-    await notifee.displayNotification({
-        title: 'My Location Reminder',
-        body: 'You have a location-based reminder!, You have been not moving for a while.',
-        android: {
-            channelId,
-            smallIcon: 'real_time_tracking',
-            pressAction: {
-                id: 'default',
+        const channelId = await createNotificationChannel();
+
+        // Display a notification
+        await notifee.displayNotification({
+            title: 'My Location Reminder',
+            body: 'You have a location-based reminder!, You have been not moving for a while.',
+            android: {
+                channelId,
+                smallIcon: 'real_time_tracking',
+                pressAction: {
+                    id: 'default',
+                },
             },
-        },
-    });
-
+        });
+    }
 }
 
 export const cancelNotification = (notificationId: string) => {

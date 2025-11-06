@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Linking, Platform } from 'react-native';
-import { LocationItem } from '../data/LocationItem';
+import { LocationItem } from '../types/LocationItem';
 
+const MIN = 60
 
 // Saving data
 export const saveDataToLocalStorage = async (key: string, value) => {
@@ -65,8 +66,25 @@ export const openMapWithCoordinates = async (latitude: number, longitude: number
     }
 };
 
+export const isUserStationary = (list: LocationItem[], mins: number, seconds: number) => {
 
-export const areLatestRangeIndicesEqual = (list: LocationItem[]) => {
+    const range = Math.floor((mins * MIN) / seconds);
+    const currentLocationsData = list;
+    const startIndex = currentLocationsData.length - range
+    const endIndex = currentLocationsData.length - 1
+
+    console.log("Locations list length: " + currentLocationsData.length + ", startIndex: " + startIndex + ", endIndex: " + endIndex)
+
+    if (!currentLocationsData || currentLocationsData.length === 0 || startIndex < 0 || endIndex > currentLocationsData.length || startIndex >= endIndex) {
+        return false;
+    }
+
+    const subArray = currentLocationsData.slice(startIndex, endIndex);
+
+    return areLatestRangeIndicesEqual(subArray)
+};
+
+const areLatestRangeIndicesEqual = (list: LocationItem[]) => {
 
     const latitudes = list.map((item: LocationItem) => parseFloat(item.latitude.toFixed(4)));
     const longitudes = list.map((item: LocationItem) => parseFloat(item.longitude.toFixed(4)));
@@ -85,6 +103,19 @@ export const areLatestRangeIndicesEqual = (list: LocationItem[]) => {
     console.log('is all lacations equal ' + isEqual)
 
     return isEqual;
+}
+
+export function logCurrentStorage() {
+    AsyncStorage.getAllKeys().then((keyArray) => {
+        AsyncStorage.multiGet(keyArray).then((keyValArray) => {
+            let myStorage: any = {};
+            for (let keyVal of keyValArray) {
+                myStorage[keyVal[0]] = keyVal[1]
+            }
+
+            console.log('CURRENT STORAGE: ', myStorage);
+        })
+    });
 }
 
 

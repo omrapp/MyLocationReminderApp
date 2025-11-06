@@ -1,5 +1,5 @@
 import BackgroundGeolocation from 'react-native-background-geolocation';
-import { LocationItem } from '../../data/LocationItem';
+import { LocationItem } from '../../types/LocationItem';
 
 export const startBackgroundLocationService = (intervalInSeconds: number, continueOnTerminate: boolean, callback: (location: LocationItem) => void) => {
 
@@ -49,6 +49,25 @@ const onMotionChange = (event) => {
         console.log('User is now stationary.');
     }
 }
+
+export const isGpsEnable = () => {
+    BackgroundGeolocation.onProviderChange((event) => {
+        console.log('[providerchange] -', event.enabled, event.status);
+
+        if (!event.enabled) {
+            // GPS is disabled or location services are not available
+            console.warn('Location services disabled or unavailable!');
+            // You can prompt the user to enable GPS here
+            // BackgroundGeolocation.showLocationSettings(); // This will open location settings
+            return false;
+        } else {
+            // GPS is enabled
+            console.log('Location services are enabled.');
+            return true;
+        }
+    });
+}
+
 
 
 // export const onLocationUpdate = (callback: (location: LocationItem) => void) => {

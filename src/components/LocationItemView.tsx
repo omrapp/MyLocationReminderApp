@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Share, Alert, Modal, TextInpu
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { useDispatch } from "react-redux";
-import { LocationItem } from "../data/LocationItem";
+import { LocationItem } from "../types/LocationItem";
 import { deleteLocation, updateLocation } from "../slices/locationSlice";
 import { openMapWithCoordinates } from "../utils/Utils";
 

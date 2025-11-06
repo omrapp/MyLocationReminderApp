@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import BackgroundTimer from 'react-native-background-timer';
 
 //redux import
@@ -8,18 +8,32 @@ import { useSelector } from "react-redux";
 //notification service imports
 import notifee, { EventType } from '@notifee/react-native';
 import { cancelAllNotifications, requestNotificationPermission, sendLocalNotification } from "../services/notification/push-notification-service";
-import { stopBackgroundLocationService } from "../services/location/background-location-service";
-import { areLatestRangeIndicesEqual } from "../utils/Utils";
+import { isGpsEnable, stopBackgroundLocationService } from "../services/location/background-location-service";
 
-const MIN = 60
 
 export const NotificationHandler = () => {
 
     const { settingsData } = useSettings();
-    const locations = useSelector((state) => state.locations.list);
-    const [latestIntervalId, setLatestIntervalId] = useState<number | null>(null)
+    const locations = useSelector((state) => state.locations.items);
+    //const { items } = useSelector((state) => state.locations.items);
+
+    //const [latestIntervalId, setLatestIntervalId] = useState<number | null>(null)
 
     const locationsRef = useRef(locations);
+
+    const removeAllSubscribes = useCallback(() => {
+
+        cancelAllNotifications();
+        stopBackgroundLocationService();
+        // if (latestIntervalId !== null) {
+        //     BackgroundTimer.clearInterval(latestIntervalId);
+        // }
+
+        // BackgroundTimer.stop();
+        //console.log('Background timer stopped.');
+
+    }, []);
+
 
     useLayoutEffect(() => {
 
@@ -32,33 +46,40 @@ export const NotificationHandler = () => {
     }, [])
 
     useEffect(() => {
+        let timerId: number;
 
-        if (settingsData.isNotificationEnabled && settingsData.isTrackerEnabled) {
+        if (settingsData.isNotificationEnabled && settingsData.isTrackerEnabled && isGpsEnable()) {
             //if (latestIntervalId === null) {
             console.log('Set Interval timer for push notification after ' + settingsData.notificationRepeatIntervalInMinutes)
-            const intervalId = BackgroundTimer.setInterval(() => {
+            timerId = BackgroundTimer.setInterval(() => {
                 console.log('Background timer triggered notification check.');
-                if (isUserStationary()) {
-                    console.log("Calling sendLocalNotification from NotificationHandler.tsx");
-                    sendLocalNotification();
-                }
-            }, settingsData.notificationRepeatIntervalInMinutes * MIN * 1000);
+                sendLocalNotification(locationsRef.current, settingsData.notificationRepeatIntervalInMinutes, settingsData.intervalInSeconds);
+            }, settingsData.notificationRepeatIntervalInMinutes * 60 * 1000);
 
-            setLatestIntervalId(intervalId)
-            // }
+            //setLatestIntervalId(intervalId)
+            //  }
         } else {
             console.log("Calling cancelAllNotifications from NotificationHandler.tsx");
             cancelAllNotifications();
-            removeBackgroundTimer()
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settingsData.isNotificationEnabled, settingsData.isTrackerEnabled, settingsData.notificationRepeatIntervalInMinutes]);
+        return () => {
+            if (timerId) {
+                BackgroundTimer.clearInterval(timerId);
+            }
+
+            BackgroundTimer.stop();
+            console.log('Background timer stopped.');
+        }
+
+    }, [settingsData]);
+
 
     useEffect(() => {
         console.log("A new location added " + locations.length);
         locationsRef.current = locations;
     }, [locations]);
+
 
     useEffect(() => {
         const unsubscribeOnForegroundEvent = notifee.onForegroundEvent(({ type, detail }) => {
@@ -85,42 +106,17 @@ export const NotificationHandler = () => {
             removeAllSubscribes();
         }
 
+    }, [removeAllSubscribes]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
-    const removeAllSubscribes = () => {
-        cancelAllNotifications();
-        stopBackgroundLocationService();
-        removeBackgroundTimer();
-    }
 
-    const isUserStationary = () => {
 
-        const range = Math.floor((settingsData.notificationRepeatIntervalInMinutes * MIN) / settingsData.intervalInSeconds);
-        const currentLocationsData = locationsRef.current;
-        const startIndex = currentLocationsData.length - range
-        const endIndex = currentLocationsData.length - 1
+    // const removeAllSubscribes = () => {
+    //     cancelAllNotifications();
+    //     stopBackgroundLocationService();
+    //     removeBackgroundTimer();
+    // }
 
-        console.log("Locations list length: " + currentLocationsData.length + ", startIndex: " + startIndex + ", endIndex: " + endIndex)
-
-        if (!currentLocationsData || currentLocationsData.length === 0 || startIndex < 0 || endIndex > currentLocationsData.length || startIndex >= endIndex) {
-            return false;
-        }
-
-        const subArray = currentLocationsData.slice(startIndex, endIndex);
-
-        return areLatestRangeIndicesEqual(subArray)
-    }
-
-    function removeBackgroundTimer() {
-        if (latestIntervalId !== null) {
-            BackgroundTimer.clearInterval(latestIntervalId);
-        }
-
-        BackgroundTimer.stop();
-        console.log('Background timer stopped.');
-    }
     return null;
 
 }

@@ -7,7 +7,7 @@ import { useSettings } from '../contexts/SettingsContext';
 
 //location srevice imports
 import { requestLocationPermission } from '../services/location/foreground-location-service';
-import { startBackgroundLocationService, stopBackgroundLocationService } from '../services/location/background-location-service';
+import { isGpsEnable, startBackgroundLocationService, stopBackgroundLocationService } from '../services/location/background-location-service';
 
 const LocationTracker = () => {
 
